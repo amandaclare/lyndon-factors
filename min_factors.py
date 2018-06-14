@@ -3,23 +3,35 @@ import re
 import itertools
 import os
 
+
 class Mapping:
-    def __init__(self, n):
+    """Holds the alphabet reordering
+    Attributes:
+      alphabet_loc: (>= 0), the number/position from which to start assignment
+      mapping: the reordering mapping
+    """
+    
+    def __init__(self, n = 0):
+        """n >= 0 is the position in the alphabet from which assignments should begin."""
         self.alphabet_loc = ord('a') + n
         self.mapping = {}
 
     def assign(self,letter):
+        """Assign the next available alphabet character to the letter, 
+        if not already assigned"""
         if letter not in self.mapping:
             self.mapping[letter] = self.alphabet_loc
             self.alphabet_loc += 1
 
     def unassign_up_to(self, letter):
+        """Unassign all assignments that were after n (not including n)"""
         n = self.look_up(letter)
         # remove items bigger than n
         self.mapping = { k:v for item in self.mapping.items if v <= n }
         self.alphabet_loc = n + 1
 
     def clear(self):
+        """Discard all assignments and reset the alphabet_loc"""
         self.mapping.clear()
         self.reset(0)
         
@@ -31,6 +43,7 @@ class Mapping:
         return self.mapping.get(letter, -1)
 
     def map_string(self, string):
+        """Translate the given string using the current mapping"""
         out = []
         for c in string:
             if c not in self.mapping:
@@ -39,6 +52,7 @@ class Mapping:
         return ''.join(out)
 
     def assign_all(self,string):
+        """Assign all letters in the string if they don't already have assignments"""
         for letter in string:
             self.assign(letter)
     
@@ -50,9 +64,12 @@ class Mapping:
         return(''.join(out))
 
 
-
+# ---------------------------------------------------------------------------
     
 def read_fasta(filename):
+    """Read the first sequence from the fasta file. 
+    Break if multiple sequences, returning only the first"""
+    
     seq = ""
     with open(filename) as f:
         header = next(f)
@@ -64,9 +81,11 @@ def read_fasta(filename):
     return seq
 
 
+# ---------------------------------------------------------------------------
+
 
 def exp_parikh_vector(s):
-    """get a list of exponent parikh vectors, in order of first occurrence of chars.
+    """Find the list of exponent parikh vectors, in order of first occurrence of chars.
     return a list of pairs: unique char, corresponding exponent vector"""
     uniques = []
     counts = {}
@@ -113,10 +132,12 @@ def print_fL(fL_prs):
         print(letter, " >= ".join(facs))
     print()
 
+    
 # ---------------------------------------------------------    
 
 def sort_pis(fL_prs):
     return sorted(((len(facs), char, facs) for (char, facs) in fL_prs), key=lambda fl: fl[0])
+
 
 
 def choose_pi(fL_prs):
@@ -135,7 +156,7 @@ def choose_pi(fL_prs):
                 facs = fs
         return (min_num, orig, facs)
 
-
+# ---------------------------------------------------------    
 
 def get_Xs_after_char(s, char):
     """Get all pieces of string that exist between the runs of the char provided
@@ -147,13 +168,14 @@ def get_Xs_after_char(s, char):
         
 def assign_to_Xs(m, facs, Xs):
     """
-    We need to assign ordering to the letters in order:
+    We need to assign ordering to the letters
     by considering each exponent group (largest to smallest) and by leftmost first
     Params:
-    - a mapping object m for storing the new ordering
+    - a mapping object m for storing the ordering
     - the list of Lyndon factors for the exponents for this letter
     - the list of string components occurring after each run of the letter in the original string
     """
+    good = True
     for fac in facs:
         lf = len(fac)
         Xs_block = Xs[0:lf]
@@ -170,7 +192,12 @@ def assign_to_Xs(m, facs, Xs):
         # in reverse numeric order of exponents (greatest first)
         sorted_exponents = iter(sorted(exp_X_dict.items(), reverse=True))
         (e, X_vals) = next(sorted_exponents)
-        # for (e, X_vals) in
+
+        # If we have a singleton, just make assignments
+        if len(X_vals) == 1:
+            for x in X_vals[0]:
+                m.assign(x)
+        # else
         for later_X_val in X_vals[1:]:
             good = True
             if len(later_X_val) > len(X_vals[0]):
@@ -186,22 +213,21 @@ def assign_to_Xs(m, facs, Xs):
                         m.assign(y)
                         if m.look_up(x) > m.look_up(y):
                             good = False  # inconsistent
+                        # we've made an assignment of difference so can stop
                         break
             if not good:
-                # undo m assignments
-                # break # from the later X_vals with same exponent
+                # caller will need to clear m
+                # break from the later X_vals with same exponent
                 return False
 
-    return True
+    return good
 
-    # now assign any leftover letters in the remaining X components arbitrarily
-    #all_letters = ''.join(X_vals)
-    #m.assign_all(all_letters)
 
         
 
 def before_char(s, c):
-    # this could be optimised - we can work out from parikhs
+    """Return the prefix of the string s up until character c"""
+    # This could be optimised - we can work out from parikhs
     n = s.find(c)
     return s[:n]
 
@@ -220,12 +246,10 @@ def alg1(s, m, no_backtrack = False):
 
     for (num, unique_char, facs) in pis: #choose_pi(fL_prs)
         string_prefix = before_char(s, unique_char)
-        #print('prefix',string_prefix)
         m.reset(len(set(string_prefix))) # allow lower nums for prefix
         m.assign(unique_char)
         Xs = get_Xs_after_char(s, unique_char)
         good = assign_to_Xs(m, facs, Xs)
-        #print(m)
         if good or no_backtrack:
             break
         else:
@@ -320,10 +344,10 @@ if __name__ == "__main__":
         if fasta_file.endswith('.fna'):
             print(fasta_file)
             s = read_fasta(directory + '/' + fasta_file)
-            do_all_reorderings(s)
+            #do_all_reorderings(s)
 
             m = Mapping(0)
-            r = alg1(s, m, no_backtrack=False)
+            r = alg1(s, m, no_backtrack=True)
             fs = list(Lyndon.ChenFoxLyndon(r))
             #print("Original string:")
             #print(s)
