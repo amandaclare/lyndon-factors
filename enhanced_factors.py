@@ -270,7 +270,7 @@ def alg1(s, m, no_backtrack = False):
 
     else:        
         # failed to make consistent - just use first one
-        (num, unique_char, facs) = pis[0]
+        (num, unique_char, facs) = prs[0]
         m.clear()
         string_prefix = before_char(s, unique_char)
         m.reset(len(set(string_prefix))) # allow lower nums for prefix
