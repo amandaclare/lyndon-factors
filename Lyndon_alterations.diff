@@ -1,0 +1,26 @@
+67c67
+< def ChenFoxLyndonBreakpoints(s):
+---
+> def ChenFoxLyndonBreakpoints(s, co_lex=False):
+78,80c78,85
+<         while j < len(s) and s[i] <= s[j]:
+<             i = (s[i] == s[j]) and i+1 or k     # Python cond?yes:no syntax
+<             j += 1
+---
+>         if co_lex:
+>             while j < len(s) and s[i] >= s[j]:
+>                 i = (s[i] == s[j]) and i+1 or k     # Python cond?yes:no syntax
+>                 j += 1
+>         else:
+>             while j < len(s) and s[i] <= s[j]:
+>                 i = (s[i] == s[j]) and i+1 or k     # Python cond?yes:no syntax
+>                 j += 1            
+85c90,91
+< def ChenFoxLyndon(s):
+---
+> 
+> def ChenFoxLyndon(s, co_lex=False):
+90c96
+<     for k in ChenFoxLyndonBreakpoints(s):
+---
+>     for k in ChenFoxLyndonBreakpoints(s, co_lex):
