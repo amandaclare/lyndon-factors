@@ -248,7 +248,7 @@ def alg1(s, m, no_backtrack = False):
 
     for (num, unique_char, facs) in prs: # or choose_pi(fL_prs) if just one needed
         string_prefix = before_char(s, unique_char)
-        m.reset(len(set(string_prefix))) # allow lower nums for prefix
+        #m.reset(len(set(string_prefix))) # allow lower nums for prefix
         m.assign(unique_char)
         Xs = get_Xs_after_char(s, unique_char)
         good = assign_to_Xs(m, facs, Xs)
@@ -260,10 +260,10 @@ def alg1(s, m, no_backtrack = False):
     if good or no_backtrack:
         # sort prefix
         if string_prefix:
-            n = m.alphabet_loc - ord('a')
-            m.reset(0)
+            #n = m.alphabet_loc - ord('a')
+            #m.reset(0)
             alg1(string_prefix, m) # not caring about result
-            m.reset(n)
+            #m.reset(n)
         m.assign_all(s)
         reordered = m.map_string(s)
         return reordered
@@ -273,15 +273,15 @@ def alg1(s, m, no_backtrack = False):
         (num, unique_char, facs) = prs[0]
         m.clear()
         string_prefix = before_char(s, unique_char)
-        m.reset(len(set(string_prefix))) # allow lower nums for prefix
+        #m.reset(len(set(string_prefix))) # allow lower nums for prefix
         m.assign(unique_char)
         Xs = get_Xs_after_char(s, unique_char)
         assign_to_Xs(m, facs, Xs)
         if string_prefix:
-            n = m.alphabet_loc - ord('a')
-            m.reset(0)
+            #n = m.alphabet_loc - ord('a')
+            #m.reset(0)
             alg1(string_prefix, m) # not caring about result
-            m.reset(n)
+            #m.reset(n)
         m.assign_all(s)
         reordered = m.map_string(s)
         return reordered
@@ -340,7 +340,7 @@ if __name__ == "__main__":
             # do_all_reorderings(s)
 
             m = Mapping(0)
-            r = alg1(s, m, no_backtrack = False)
+            r = alg1(s, m, no_backtrack = True)
             fs = list(Lyndon.ChenFoxLyndon(r))
             #print("Original string:")
             #print(s)
