@@ -4,5 +4,5 @@ Code for the calculation of enhanced Lyndon factorisation of a string, by choosi
 
 The code here is a prototype implementation of the algorithm, not yet optimised for efficiency.
 
-Makes use of David Eppstein's implementation of Lyndon factorisation https://www.ics.uci.edu/~eppstein/PADS/Lyndon.py
+Makes use of David Eppstein's implementation of Lyndon factorisation https://www.ics.uci.edu/~eppstein/PADS/Lyndon.py and https://www.ics.uci.edu/~eppstein/PADS/Eratosthenes.py
 
