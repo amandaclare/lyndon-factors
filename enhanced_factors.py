@@ -104,7 +104,7 @@ def exp_parikh_vector(s):
             counts[c].append(1)
         else:
             counts[c][-1] += 1
-    eps = [(c,''.join(map(str, counts[c]))) for c in uniques]
+    eps = [(c,counts[c]) for c in uniques]
     return eps
 
 
@@ -129,7 +129,7 @@ def print_eps(eps):
 def print_fL(fL_prs):
     print("Lyndon factors of eps:")
     for (letter, facs) in fL_prs:
-        print(letter, " >= ".join(facs))
+        print(letter, " >= ".join(map(str,facs)))
     print()
 
     
